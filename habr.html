@@ -1,0 +1,1488 @@
+<!doctype html>
+<html ⚡>
+<head>
+  <meta charset="utf-8" />
+  <title>Введение в REST API — RESTful веб-сервисы / Habr</title>
+  <link href="https://fonts.googleapis.com/css?family=Fira+Sans:500&amp;subset=cyrillic" rel="stylesheet" />
+  <link rel="canonical" href="https://habr.com/ru/articles/483202/">
+  <meta name="viewport" content="width=device-width,minimum-scale=1" />
+  <style amp-boilerplate>body{-webkit-animation:-amp-start 8s steps(1,end) 0s 1 normal both;-moz-animation:-amp-start 8s steps(1,end) 0s 1 normal both;-ms-animation:-amp-start 8s steps(1,end) 0s 1 normal both;animation:-amp-start 8s steps(1,end) 0s 1 normal both}@-webkit-keyframes -amp-start{from{visibility:hidden}to{visibility:visible}}@-moz-keyframes -amp-start{from{visibility:hidden}to{visibility:visible}}@-ms-keyframes -amp-start{from{visibility:hidden}to{visibility:visible}}@-o-keyframes -amp-start{from{visibility:hidden}to{visibility:visible}}@keyframes -amp-start{from{visibility:hidden}to{visibility:visible}}</style><noscript><style amp-boilerplate>body{-webkit-animation:none;-moz-animation:none;-ms-animation:none;animation:none}</style></noscript>
+  <script async src="https://cdn.ampproject.org/v0.js"></script>
+  <script async custom-element="amp-sidebar" src="https://cdn.ampproject.org/v0/amp-sidebar-0.1.js"></script>
+  <script async custom-template="amp-mustache" src="https://cdn.ampproject.org/v0/amp-mustache-0.2.js"></script>
+  <script async custom-element="amp-list" src="https://cdn.ampproject.org/v0/amp-list-0.1.js"></script>
+  <script async custom-element="amp-date-display" src="https://cdn.ampproject.org/v0/amp-date-display-0.1.js"></script>
+  <script async custom-element="amp-analytics" src="https://cdn.ampproject.org/v0/amp-analytics-0.1.js"></script>
+  <script async custom-element="amp-iframe" src="https://cdn.ampproject.org/v0/amp-iframe-0.1.js"></script>
+  <script type="application/ld+json">
+    {"@context":"http:\/\/schema.org","@type":"Article","mainEntityOfPage":{"@type":"WebPage","@id":"https:\/\/habr.com\/ru\/articles\/483202\/"},"headline":"Введение в REST API — RESTful веб-сервисы","datePublished":"2020-01-10T09:47:18+03:00","dateModified":"2020-12-09T15:16:15+03:00","author":{"@type":"Person","name":"val6852"},"publisher":{"@type":"Organization","name":"Habr","logo":{"@type":"ImageObject","url":"https:\/\/habrastorage.org\/webt\/a_\/lk\/9m\/a_lk9mjkccjox-zccjrpfolmkmq.png"}},"description":"Эта статья начинает серию постов о разработке REST API:    Введение в REST API &mdash; RESTful веб-сервисы Различия REST и SOAP Разработка REST API &mdash; что такое Contrac...","url":"https:\/\/habr.com\/ru\/articles\/483202\/#post-content-body","about":["h_api","f_develop"],"image":["https:\/\/habrastorage.org\/webt\/uf\/fc\/qb\/uffcqbxqp_7jy3xadbybzp3l19u.png","https:\/\/habrastorage.org\/webt\/c8\/uc\/dv\/c8ucdvx6ti0hypqhgghh-gopzm8.png","https:\/\/habrastorage.org\/webt\/0g\/o5\/bo\/0go5bola21uojbky4ys--n2e3ic.png","https:\/\/habrastorage.org\/webt\/qq\/mw\/en\/qqmwenq9zhpb6hwamxodeidivno.png","https:\/\/habrastorage.org\/webt\/by\/hl\/59\/byhl59bblw_a66hik1ylkfvi4cm.png","https:\/\/habrastorage.org\/webt\/xn\/om\/zs\/xnomzs-450ljr_-fei-vhx7kj-k.png"]}
+  </script>
+  <style amp-custom>
+    body {
+      background-color: #f0f0f0;
+      min-height: 100vh;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+
+    p, h1, h2, h3, h4, h5, h6 {
+      margin: 0;
+      padding: 0;
+    }
+
+    h1, h2 {
+      font-size: 20px;
+      line-height: 26px;
+      font-weight: 500;
+    }
+
+    h3 {
+      font-size: 18px;
+      line-height: 23px;
+      font-weight: 500;
+    }
+
+    h4, h5, h6 {
+      font-size: 16px;
+      line-height: 20px;
+      font-weight: 500;
+    }
+
+    a {
+      color: #548eaa;
+      text-decoration: none;
+    }
+
+    blockquote {
+      background: transparent;
+      border-left: 4px solid #548EAA;
+      display: block;
+      margin: 12px 0;
+      padding: 0 12px;
+    }
+    code {
+      overflow-wrap: break-word;
+      white-space: normal;
+    }
+
+    iframe {
+      max-width: 100%;
+    }
+
+    hr {
+      border: 0;
+      border-bottom: 1px solid rgba(255,255,255,0.3);
+      border-top: 1px solid rgba(255,255,255,0.3);
+      height: 0;
+    }
+
+    table {
+      border: 1px solid #d5dddf;
+      border-collapse: collapse;
+      margin: 1.5em 0;
+      width: 100%;
+    }
+
+    table td,
+    table th {
+      border: 1px solid #d5dddf;
+      line-height: 1.5;
+      padding: 6px 12px 9px;
+      vertical-align: top;
+    }
+
+    ul {
+      list-style-type: disc;
+    }
+
+    ul, ul ul, ol ul, ol, ul ol, ol ol {
+      margin: 9px 0 0 30px;
+      padding: 0;
+    }
+
+    li {
+      line-height: 1.6;
+      margin: 0;
+      padding: 6px 0;
+    }
+
+    li:first-child,
+    li:last-child {
+      padding-top: 0;
+    }
+
+    pre {
+      font-size: 14px;
+      margin: 0;
+      overflow: auto;
+      white-space: pre;
+      word-break: normal;
+      word-wrap: normal;
+    }
+
+    pre code {
+      background: #fbfdff;
+      border: 1px solid #e5e8ec;
+      border-radius: 4px;
+      display: block;
+      font-size: inherit;
+      line-height: 1.6;
+      overflow: auto;
+      padding: 17px 20px 20px;
+      white-space: unset;
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    .tm-header {
+      background-color: #303b44;
+      position: relative;
+      z-index: 30;
+    }
+
+    .tm-sidebar {
+      width: 72%;
+    }
+
+    .tm-header__burger {
+      color: #fff;
+      height: 16px;
+      left: 0;
+      width: 20px;
+    }
+
+    .tm-header__container {
+      align-items: center;
+      box-sizing: border-box;
+      display: flex;
+      height: 48px;
+      margin: 0 auto;
+      max-width: 780px;
+      min-width: 320px;
+      padding: 0 42px 0 16px;
+    }
+
+    .tm-header__logo {
+      color: #fff;
+      height: 24px;
+      margin: 0 0 0 20px;
+      width: 51px;
+      fill: currentColor;
+      overflow: hidden;
+      stroke: inherit;
+      top: 3px;
+      position: relative;
+    }
+
+    .tm-layout__container {
+      max-width: 780px;
+      min-width: 320px;
+      margin: 0 auto;
+    }
+
+    .tm-sidebar__container {
+      background-color: #fff;
+      display: flex;
+      flex-direction: column;
+      min-height: 100%;
+      position: relative;
+    }
+
+    .tm-main-menu__item {
+      border-bottom: 1px solid #eaeaea;
+      color: #333;
+      cursor: pointer;
+      display: block;
+      font-size: 16px;
+      font-weight: 500;
+      line-height: 60px;
+      padding-left: 20px;
+      position: relative;
+      text-decoration: none;
+    }
+
+    .tm-sidebar-submenu__title {
+      color: #798e98;
+      font-size: 10px;
+      letter-spacing: 0.4px;
+      line-height: 12px;
+      margin-bottom: 7px;
+      padding-left: 20px;
+    }
+
+    .tm-sidebar-submenu__item {
+      color: #444;
+      display: block;
+      font-size: 15px;
+      font-weight: 500;
+      line-height: 44px;
+      padding-left: 20px;
+      text-decoration: none;
+    }
+
+    .tm-article-hubs {
+      box-sizing: border-box;
+      color: #333;
+    }
+
+    .tm-article-hubs__hub {
+      display: inline-block;
+      vertical-align: baseline;
+    }
+
+    .tm-article-hubs__link {
+      color: #5e6973;
+      font-size: 13px;
+      font-weight: 500;
+      line-height: 24px;
+      text-decoration: none;
+    }
+
+    .tm-article {
+      background-color: #fff;
+      padding: 16px 16px 0;
+      color: #111;
+      font-size: 16px;
+      line-height: 1.56;
+    }
+
+    .tm-article img {
+      max-width: 100%;
+    }
+
+    .tm-article-title {
+      font-family: Fira Sans, sans-serif;
+      color: #333;
+      font-weight: 500;
+      overflow-x: auto;
+      word-break: break-word;
+      font-size: 24px;
+      line-height: 34px;
+      margin: 0;
+    }
+
+    .tm-user-meta {
+      display: flex;
+      font-size: 13px;
+      font-weight: 500;
+      line-height: 24px;
+      margin: 0 0 11px;
+    }
+
+    .tm-entity-image {
+      border-radius: 3px;
+      margin: 0 8px 0 0;
+    }
+
+    .tm-user-info__userpic {
+      display: inline-block;
+      margin: 0 8px 0 0;
+    }
+
+    .tm-user-info {
+      display: flex;
+      text-decoration: none;
+    }
+
+    .tm-user-info__username {
+      color: #414b50;
+      display: inline-block;
+      font-size: 13px;
+      font-weight: 700;
+      line-height: 24px;
+      vertical-align: middle;
+    }
+
+    .tm-user-meta__date {
+      color: #777;
+      margin: 0 0 0 8px;
+      vertical-align: middle;
+    }
+
+    .tm-article-comments__icon {
+      fill: #95b8d3;
+      display: inline-block;
+      height: 16px;
+      margin-right: 8px;
+      vertical-align: middle;
+      width: 16px;
+    }
+
+    .tm-article-title__link {
+      font-size: 20px;
+      line-height: 28px;
+      text-decoration: none;
+      font-family: Fira Sans, sans-serif;
+      color: #333;
+    }
+
+    .tm-article-comments {
+      margin: 12px 0 48px;
+      font-size: 14px;
+      align-items: center;
+      background-color: #fff;
+      display: flex;
+      height: 56px;
+      justify-content: center;
+      text-decoration: none;
+      color: #548eaa;
+    }
+
+    .tm-article-comments_fallback {
+      margin: 0;
+    }
+
+    .tm-data-icons {
+      align-items: center;
+      display: table;
+      display: flex;
+      justify-content: space-between;
+      width: 100%;
+      border-top: 1px solid #d5dddf;
+      height: 48px;
+    }
+
+    .tm-icon-text {
+      color: #798e98;
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .tm-icon-text__icon {
+      align-self: center;
+      display: inline-block;
+      margin: 0 8px 0 0;
+      vertical-align: middle;
+    }
+
+    .tm-votes-meter__score {
+      font-size: 14px;
+      line-height: 16px;
+      margin: 0 14px;
+    }
+
+    .tm-article__tags {
+      display: flex;
+      font-size: 16px;
+      line-height: 180%;
+      margin: 32px 0;
+    }
+
+    .tm-article__tags-title {
+      color: #444;
+      font-weight: 700;
+      margin-right: 12px;
+    }
+
+    .tm-article__tags a {
+      color: #548eaa;
+      text-decoration: none;
+    }
+
+    .tm-user-card.tm-page-article__author {
+      padding-bottom: 23px;
+    }
+
+    .tm-user-card__header,
+    .tm-user-card__header-data,
+    .tm-user-card__meta {
+      display: flex;
+    }
+
+    .tm-user-card__userpic {
+      border-radius: 3px;
+      -webkit-box-flex: 0;
+      -ms-flex: none;
+      flex: none;
+      height: 48px;
+      margin-right: 16px;
+      margin: 2px 8px 0 0;
+      overflow: hidden;
+      width: 48px;
+    }
+
+    .tm-user-card__karma,
+    .tm-user-card__rating {
+      margin-right: 24px;
+    }
+
+    .tm-user-card {
+      background-color: #fff;
+      padding: 14px 16px 12px;
+      margin: 12px 0;
+    }
+
+    .tm-votes-score,
+    .tm-rating__counter {
+      display: flex;
+      font-size: 17px;
+      font-weight: 700;
+      line-height: 24px;
+      margin: 0 0 8px;
+    }
+
+    .tm-rating__counter {
+      color: #cd66cd;
+    }
+
+    .tm-votes-score {
+      color: #6c9000;
+    }
+
+    .tm-karma__text,
+    .tm-rating__text {
+      color: #6f7577;
+      font-size: 12px;
+      line-height: 16px;
+    }
+
+    .tm-user-card__header {
+      align-items: flex-start;
+      margin-bottom: 11px;
+    }
+
+    .tm-user-card__title {
+      margin-bottom: 4px;
+    }
+
+    .tm-user-card__name {
+      color: #333;
+      font-weight: 700;
+      margin-right: 4px;
+      font-size: 14px;
+      line-height: 20px;
+    }
+
+    .tm-user-card__nickname {
+      color: #558cb7;
+      text-decoration: none;
+      font-size: 14px;
+      line-height: 20px;
+    }
+
+    .tm-user-card__short-info {
+      color: #343434;
+      font-size: 14px;
+      line-height: 20px;
+      margin: 0;
+    }
+
+    .tm-footer {
+      background-color: #2b3134;
+      margin: auto 0 0;
+      margin-top: 40px;
+    }
+
+    .tm-footer__container {
+      box-sizing: border-box;
+      margin-left: auto;
+      margin-right: auto;
+      max-width: 780px;
+      min-width: 320px;
+      padding: 36px 16px 72px;
+      text-align: center;
+    }
+
+    .tm-footer__title {
+      display: flex;
+      justify-content: center;
+      margin: 0 0 36px;
+    }
+
+    .tm-footer__title-link {
+      color: #fff;
+      display: block;
+      height: 24px;
+      text-decoration: none;
+      width: 67px;
+    }
+
+    .tm-footer__title-link svg {
+      width: 100%;
+      height: 100%;
+      color: white;
+      fill: currentColor;
+    }
+
+    .tm-footer__link {
+      align-items: center;
+      border: 1px solid #4b575d;
+      box-sizing: border-box;
+      color: #bdcdd6;
+      cursor: pointer;
+      font-size: 14px;
+      height: 48px;
+      justify-content: center;
+      margin: 0 0 16px;
+      text-decoration: none;
+      display: flex;
+    }
+
+    .tm-copyright,
+    .tm-copyright__link {
+      color: #bdcdd6;
+      font-size: 14px;
+      text-decoration: none;
+    }
+    .tm-article-list-block {
+      margin-top: 12px;
+    }
+
+    .tm-article-list-block__header {
+      align-items: center;
+      border-bottom: 1px solid #eaeaea;
+      background-color: #fff;
+      display: flex;
+      height: 60px;
+      padding: 0 16px;
+      margin-top: 1px;
+    }
+
+    .tm-article-list-block__title {
+      font-family: Fira Sans, sans-serif;
+      color: #505c66;
+      font-size: 14px;
+      font-weight: 500;
+      letter-spacing: .8px;
+      text-transform: uppercase;
+    }
+
+    .tm-article-similar_preview {
+      border-bottom: 1px solid #eaeaea;
+      padding: 16px 16px;
+      background-color: #fff;
+    }
+
+    .tm-article-similar_preview:first-child {
+      margin-top: 62px;
+    }
+
+    .tm-article-similar__date {
+      color: #777;
+      font-size: 13px;
+      font-weight: 500;
+      line-height: 16px;
+    }
+
+    .article-body {
+      padding-top: 16px;
+    }
+
+    .tm-article-similar-title_preview {
+      font-size: 20px;
+      line-height: 28px;
+      text-decoration: none;
+    }
+    .tm-article-origin {
+      background: #f5f3f8;
+      font-size: 13px;
+      font-weight: 500;
+      line-height: 24px;
+      margin-bottom: 12px;
+      padding: 6px 8px;
+    }
+    .tm-article-origin__link {
+      color: #6864a3;
+      text-decoration: none;
+    }
+    .tm-tags_post {
+      margin-bottom: 12px;
+    }
+    .tm-tags__tag {
+      border: 1px solid #afb0e2;
+      border-radius: 2px;
+      box-sizing: border-box;
+      color: #6667a2;
+      font-size: 12px;
+      line-height: 1.2;
+      margin-right: 8px;
+      padding: 4px 8px;
+    }
+
+    .tm-article-body_v2 p {
+        font-size: 16px;
+        line-height: 24px;
+        margin: 0
+    }
+
+    .tm-article-body_v2 figure {
+        margin: 0
+    }
+
+    .tm-article-body_v2 figure img {
+        max-width: 100%
+    }
+
+    .tm-article-body_v2 figure figcaption {
+        color: #909090;
+        font-size: 13px;
+        line-height: 18px;
+        margin-top: 4px;
+        text-align: center
+    }
+
+    .tm-article-body_v2 .embed_link {
+        -webkit-box-align: center;
+        -ms-flex-align: center;
+        align-items: center;
+        border: 1px solid #d4e4ef;
+        border-radius: 4px;
+        -webkit-box-sizing: border-box;
+        box-sizing: border-box;
+        display: -webkit-box;
+        display: -ms-flexbox;
+        display: flex;
+        overflow: hidden;
+        padding: 12px;
+        width: 100%
+    }
+
+    .tm-article-body_v2 .embed_layout-right {
+        -webkit-box-orient: horizontal;
+        -webkit-box-direction: reverse;
+        -ms-flex-direction: row-reverse;
+        flex-direction: row-reverse
+    }
+
+    .tm-article-body_v2 .embed_layout-right .embed__thumb {
+        display: none;
+    }
+
+    .tm-article-body_v2 .embed__thumb {
+        background-position: 50%;
+        background-repeat: no-repeat;
+        background-size: cover;
+        height: 48px;
+        outline: 1px solid #eee;
+        width: 48px
+    }
+
+    .tm-article-body_v2 .embed__caption {
+        -webkit-box-sizing: border-box;
+        box-sizing: border-box;
+        color: #111;
+        display: block;
+        font-size: 14px;
+        line-height: 24px;
+        min-width: 0;
+        padding: 0 12px;
+        white-space: normal;
+        width: 100%
+    }
+
+    .tm-article-body_v2 .embed__caption-title {
+        font-size: 16px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap
+    }
+
+    .tm-article-body_v2 .embed__caption-description {
+        color: #777;
+        font-size: 14px;
+        line-height: 20px;
+        margin: 8px 0
+    }
+
+    .tm-article-body_v2 .embed__caption-link,
+    .tm-article-body_v2 .embed__caption-link:visited {
+        color: #111
+    }
+
+    .tm-article-body_v2 .table {
+      overflow-x: auto;
+      max-width: 100%;
+    }
+
+    .tm-article-body_v2 table {
+        border-collapse: collapse;
+        margin: 0;
+        table-layout: fixed
+    }
+
+    .tm-article-body_v2 table caption {
+        text-align: left;
+        text-indent: 1em
+    }
+
+    .tm-article-body_v2 table td,
+    .tm-article-body_v2 table th {
+        line-height: 1.5;
+        padding: 6px 12px 9px;
+        vertical-align: top
+    }
+
+    .tm-article-body_v2 table td img,
+    .tm-article-body_v2 table th img {
+        height: auto;
+        max-width: 100%
+    }
+
+    .tm-article-body_v2 details {
+        background: #fafafa;
+        border-radius: 4px;
+        -webkit-box-sizing: border-box;
+        box-sizing: border-box;
+        overflow: hidden;
+        padding: 16px 36px;
+        -webkit-user-select: none;
+        -moz-user-select: none;
+        -ms-user-select: none;
+        user-select: none
+    }
+
+    .tm-article-body_v2 details[open] summary:before {
+        -webkit-transform: rotate(90deg);
+        transform: rotate(90deg)
+    }
+
+    .tm-article-body_v2 summary {
+        border-bottom: 1px dashed;
+        color: #548eaa;
+        cursor: pointer;
+        display: inline-block;
+        font-size: 16px;
+        line-height: 19px;
+        outline: 0;
+        position: relative;
+        white-space: nowrap
+    }
+
+    .tm-article-body_v2 summary::-webkit-details-marker {
+        display: none
+    }
+
+    .tm-article-body_v2 summary::-moz-list-bullet {
+        list-style-type: none
+    }
+
+    .tm-article-body_v2 summary:before {
+        border-color: transparent transparent transparent #548eaa;
+        border-style: solid;
+        border-width: 4px 0 4px 4px;
+        content: "";
+        height: 0;
+        left: -12px;
+        position: absolute;
+        top: 50%;
+        -webkit-transform: translateY(-50%);
+        transform: translateY(-50%);
+        -webkit-transform-origin: 75% 25%;
+        transform-origin: 75% 25%;
+        -webkit-transition: -webkit-transform .1s linear;
+        transition: -webkit-transform .1s linear;
+        transition: transform .1s linear;
+        transition: transform .1s linear,-webkit-transform .1s linear;
+        width: 0
+    }
+
+    .tm-article-body_v2 .spoiler__content {
+        font-size: 16px;
+        line-height: 26px;
+        margin: 10px 0 8px
+    }
+
+    .tm-article-body_v2 .image-inline {
+        margin: 0 4px;
+        max-height: 24px
+    }
+
+    .tm-article-body_v2 hr {
+        border: 1px solid #111;
+        border-bottom: 0;
+        height: 0;
+        margin: 56px auto;
+        max-width: 280px
+    }
+
+    .tm-article-body_v2 amp-img + span {
+      width: 100%;
+      display: block;
+      font-size: 13px;
+      line-height: 18px;
+      text-align: center;
+      color: #909090;
+      margin-top: 4px;
+    }
+
+    .tm-article-body_v2 h2 {
+        margin-top: 56px
+    }
+
+    .tm-article-body_v2 h3,
+    .tm-article-body_v2 h4 {
+        margin-top: 32px
+    }
+
+    .tm-article-body_v2 h2+p,
+    .tm-article-body_v2 h3+p,
+    .tm-article-body_v2 h4+p {
+        margin-top: 12px
+    }
+
+    .tm-article-body_v2 h2+ol,
+    .tm-article-body_v2 h2+ul,
+    .tm-article-body_v2 h3+ol,
+    .tm-article-body_v2 h3+ul,
+    .tm-article-body_v2 h4+ol,
+    .tm-article-body_v2 h4+ul {
+        margin-top: 24px
+    }
+
+    .tm-article-body_v2 ol,
+    .tm-article-body_v2 ul {
+        margin-top: 32px
+    }
+
+    .tm-article-body_v2 ol li+li,
+    .tm-article-body_v2 ul li+li {
+        margin: 12px 0 0
+    }
+
+    .tm-article-body_v2 ol ol,
+    .tm-article-body_v2 ol ul,
+    .tm-article-body_v2 ul ol,
+    .tm-article-body_v2 ul ul {
+        margin-top: 12px
+    }
+
+    .tm-article-body_v2 .embed_link,
+    .tm-article-body_v2 .embed_link+p,
+    .tm-article-body_v2 .embed_video,
+    .tm-article-body_v2 .embed_video+p,
+    .tm-article-body_v2 .formula,
+    .tm-article-body_v2 .formula+p,
+    .tm-article-body_v2 blockquote,
+    .tm-article-body_v2 blockquote+p,
+    .tm-article-body_v2 details,
+    .tm-article-body_v2 details+p,
+    .tm-article-body_v2 > div,
+    .tm-article-body_v2 > div+p,
+    .tm-article-body_v2 pre,
+    .tm-article-body_v2 pre+p,
+    .tm-article-body_v2 table,
+    .tm-article-body_v2 table+p {
+        margin-top: 32px
+    }
+
+    .tm-article-body_v2 p+p {
+        margin-top: 24px
+    }
+
+    .tm-article-body_v2 > *:first-child {
+      margin-top: 0;
+    }
+
+    .tm-article-body_v2 .persona {
+      clear: both;
+      margin: 24px 0;
+      min-height: 60px;
+    }
+
+    .tm-article-body_v2 .persona__image {
+      position: relative;
+      overflow: hidden;
+      width: 60px;
+      height: 60px;
+      border-radius: 30px;
+      margin-right: 16px;
+      float: left;
+      object-fit: cover;
+    }
+
+    .tm-article-body_v2 .persona__image:not([src]) {
+      display: none;
+    }
+
+    .tm-article-body_v2 .persona__heading {
+      font-style: normal;
+      font-weight: 400;
+      font-size: 16px;
+      line-height: 24px;
+    }
+
+    .tm-article-body_v2 .persona__text,
+    .tm-article-body_v2 .persona__heading + p {
+      clear: none;
+      font-size: 13px;
+      font-weight: 400;
+      line-height: 20px;
+      color: #909090;
+      margin-top: 4px;
+      overflow: hidden;
+    }
+
+    .tm-image-placeholder {
+      fill: currentColor;
+    }
+
+    .tm-image-placeholder_blue {
+      color: #8baab5;
+    }
+
+    .tm-image-placeholder_green {
+      color: #8bb58c
+    }
+
+    .tm-image-placeholder_lilac {
+      color: #a08bb5;
+    }
+
+    .tm-image-placeholder_pink {
+      color: #b58ba9;
+    }
+  </style>
+</head>
+
+<body>
+  <!-- amp pixel will not work on localhost due to http -->
+  <amp-pixel src="https://habr.com/ru/amp/api/pageview/483202" layout="nodisplay"></amp-pixel>
+  <!-- begin sidebar -->
+  <amp-sidebar id="sidebar" class="tm-sidebar" layout="nodisplay" side="left">
+    <div class="tm-sidebar__container">
+      <div>
+        <a href="/all/" class="tm-main-menu__item"><span>Все потоки</span></a>
+        
+          <a href="/ru/flows/develop" class="tm-main-menu__item"><span>Разработка</span></a>
+        
+          <a href="/ru/flows/admin" class="tm-main-menu__item"><span>Администрирование</span></a>
+        
+          <a href="/ru/flows/design" class="tm-main-menu__item"><span>Дизайн</span></a>
+        
+          <a href="/ru/flows/management" class="tm-main-menu__item"><span>Менеджмент</span></a>
+        
+          <a href="/ru/flows/marketing" class="tm-main-menu__item"><span>Маркетинг</span></a>
+        
+          <a href="/ru/flows/popsci" class="tm-main-menu__item"><span>Научпоп</span></a>
+        
+        <a href="/specials/" class="tm-main-menu__item"><span>Спецпроекты</span></a>
+        <a href="/sandbox/start/" class="tm-main-menu__item"><span>Как стать автором</span></a>
+        <a href="/docs/help/" class="tm-main-menu__item"><span>Помощь</span></a>
+        <a href="/feedback/" class="tm-main-menu__item"><span>Техническая поддержка</span></a>
+      </div>
+    </div>
+  </amp-sidebar>
+
+  <!-- begin header -->
+  <header class="tm-header">
+    <div class="tm-header__container">
+      <span role="navigation" tabindex="1" on="tap:sidebar.toggle" class="tm-svg-icon__wrapper tm-header__burger">
+        <svg id="header-burger" fill="currentColor" viewBox="0 0 46 32" width="20" height="20">
+          <path
+            d="M0 0h45.714v4.571h-45.714v-4.571zm0 13.714h45.714v4.571h-45.714v-4.571zm0 13.715h45.714v4.571h-45.714v-4.571z">
+          </path>
+        </svg>
+      </span>
+      <a href="/" class="tm-svg-icon__wrapper tm-header__logo">
+        <svg height="100%" width="100%" class="tm-svg-img tm-svg-icon">
+          <use xlink:href="https://habr.com/img/habr-logo-ru.svg#logo"></use>
+        </svg>
+      </a>
+      <span></span>
+    </div>
+  </header>
+  <!-- begin main -->
+  <main class="tm-layout__container">
+      <amp-analytics type="googleanalytics" config="/ga4.json" data-credentials="include">
+        <script type="application/json">
+          {
+            "vars": {
+              "GA4_MEASUREMENT_ID": "G-S28W1WC23F",
+              "GA4_ENDPOINT_HOSTNAME": "www.google-analytics.com",
+              "DEFAULT_PAGEVIEW_ENABLED": false,
+              "GOOGLE_CONSENT_ENABLED": false,
+              "WEBVITALS_TRACKING": false,
+              "PERFORMANCE_TIMING_TRACKING": false,
+              "SEND_DOUBLECLICK_BEACON": false
+            },
+            "linker": {
+              "domains": ["toster.ru", "habr.com", "account.habr.com", "m.habr.com"],
+              "enabled": true
+            },
+            "triggers": {
+              "default pageview": {
+                "on": "visible",
+                "request": "ga4Event",
+                "vars": {
+                  "ga4_event_name": "page_view"
+                },
+                "extraUrlParams": {
+                    "event__hubs_and_flows": "h_17690,f_develop"
+                }
+              },
+              "click on #comments-link trigger": {
+                "on": "click",
+                "request": "ga4Event",
+                "vars": {
+                  "ga4_event_name": "button_comments_amp"
+                }
+              },
+              "click on #similar-link trigger": {
+                "on": "click",
+                "selector": "#similar-link",
+                "request": "ga4Event",
+                "vars": {
+                  "ga4_event_name": "tm_block_similar_posts_amp"
+                }
+              },
+              "click on #top-link trigger": {
+                "on": "click",
+                "selector": "#top-link",
+                "request": "ga4Event",
+                "vars": {
+                  "ga4_event_name": "tm_block_most_read_amp"
+                }
+              }
+            }
+          }
+        </script>
+      </amp-analytics>
+      
+        <amp-analytics type="metrika">
+          <script type="application/json">
+            {
+              "vars": {
+                "counterId": "24049213"
+              },
+              "triggers": {
+                "default pageview": {
+                  "on": "visible",
+                  "request": "pageview"
+                }
+              }
+            }
+          </script>
+        </amp-analytics>
+      
+      
+
+      <!-- begin article -->
+      <article class="tm-article tm-page-article__content tm-page-article__content_narrow">
+        <div class="tm-user-meta">
+          <a href="/users/val6852/posts" class="tm-user-info">
+            <div class="tm-user-info__userpic">
+              
+                <svg height="24px" width="24px" viewBox="0 0 24 24" class="tm-svg-img tm-image-placeholder tm-image-placeholder_blue">
+                  <path d="M21.5 24h-19c-1.379 0-2.5-1.122-2.5-2.5v-19c0-1.379 1.122-2.5 2.5-2.5h19c1.379 0 2.5 1.122 2.5 2.5v19c0 1.379-1.122 2.5-2.5 2.5zm-19-23c-.827 0-1.5.673-1.5 1.5v19c0 .827.673 1.5 1.5 1.5h19c.827 0 1.5-.673 1.5-1.5v-19c0-.827-.673-1.5-1.5-1.5h-19zM15.598 12.385zM19.438 15.417l-.002-.005v-.001c-.875-2.226-2.484-3.054-3.445-3.549l-.273-.143c.029-.497-.025-1.034-.167-1.599l-.128.032.123-.044c-.765-2.152-1.757-2.585-2.632-2.967l-.006-.003-.535-2.121c.357-.065.628-.375.628-.752.001-.423-.342-.765-.765-.765s-.766.342-.766.765c0 .358.248.657.581.74l-.825 1.654-.014-.003-.024-.003c-1.053-.033-1.842.369-2.5.947-.633-.322-1.515-.729-2.158-1.814.107-.12.174-.276.174-.45 0-.375-.303-.678-.678-.678s-.678.303-.678.678.303.678.678.678l.221-.04c.416.597 1.09 1.181 1.347 2.828l-.072.091.104.081-.112-.067c-1.157 1.914-.793 4.248.207 5.37-.998 2.546-1.035 4.681-.097 5.868l.002.002.003.003c.119.162.313.233.524.233.189 0 .39-.057.559-.154.312-.179.441-.459.326-.713l-.12.054.119-.056c-.581-1.243-.474-2.713.314-4.37.4.131.778.208 1.145.234l.139.73c.264 1.418.514 2.757 1.297 4.006.132.264.453.387.777.387.122 0 .245-.018.357-.051.385-.116.591-.399.537-.738l-.129.021.125-.042c-.204-.606-.431-1.146-.649-1.67-.373-.894-.725-1.742-.891-2.737.407-.042.797-.129 1.161-.261.825.692 1.661 1.492 2.743 3.406h.001c.072.14.224.215.41.215.105 0 .222-.024.339-.073.365-.155.652-.531.477-1.006v-.001c-.432-1.849-1.426-2.778-2.428-3.547.162-.175.311-.366.442-.576.75.399 1.878 1.005 3.127 2.766l.047.067.011-.008c.151.156.317.24.48.24.096 0 .191-.027.279-.084.306-.194.439-.662.29-1.005zm-8.878-2.493c-.947 0-1.713-.767-1.713-1.713s.767-1.713 1.713-1.713c.947 0 1.713.767 1.713 1.713s-.767 1.713-1.713 1.713zm6.587 4.648l-.084.021v-.001l.084-.02zm-2.007-5.312zm.022 1.006zM11.225 11.604c0 .385-.312.697-.697.697s-.697-.312-.697-.697c0-.385.312-.697.697-.697s.697.312.697.697z" />
+                </svg>
+              
+            </div>
+            <span class="tm-user-info__username">val6852</span>
+          </a>
+          <span title="2020-01-10T06:47:18+00:00" class="tm-user-meta__date">
+            <amp-date-display locale="ru" layout="fixed-height" height="24px" datetime="2020-01-10T06:47:18+00:00">
+              <template type="amp-mustache">
+                {{ day }}
+                {{ monthNameShort }}
+                {{ year }}, {{ hour }}:{{ minute }}
+              </template>
+            </amp-date-display>
+          </span>
+        </div>
+        <h2 class="tm-article-title">
+          Введение в REST API — RESTful веб-сервисы
+        </h2>
+
+        <div class="tm-article-hubs tm-article-hubs">
+          
+          <div class="tm-article-hubs__hub">
+              <a href="/hub/api/" class="tm-article-hubs__link">
+                API
+              </a>
+              
+           </div>
+          
+        </div>
+
+        
+        <div class="tm-tags tm-tags_post">
+          
+          
+          
+        </div>
+        <div class="article-body tm-article-body_v1" id="post-content-body">
+          <p>Эта статья начинает серию постов о разработке REST API:<br>
+<br>
+</p>
+<ul>
+<li>Введение в REST API — RESTful веб-сервисы</li>
+<li><a href="https://habr.com/ru/post/483204/">Различия REST и SOAP</a></li>
+<li><a href="https://habr.com/ru/post/483206/">Разработка REST API — что такое Contract First (контракт в первую очередь)?</a></li>
+<li><a href="https://habr.com/ru/post/483322/">Разработка REST API — что такое Code First (код в первую очередь)?</a></li>
+<li><a href="https://habr.com/ru/post/483328/">REST API — Что такое HATEOAS?</a></li>
+<li><a href="https://habr.com/ru/post/483374/">Рекомендации по REST API — примеры проектирования веб-сервисов на Java и Spring</a></li>
+</ul>
+<br>
+Она содержит введение в RESTful веб-сервисы и краткий обзор REST и HTTP.<br>
+<br>
+<amp-img src="https://habrastorage.org/webt/uf/fc/qb/uffcqbxqp_7jy3xadbybzp3l19u.png" alt="" height="474" width="705" layout="intrinsic"></amp-img><br>
+<i>Intro to RESTful Web Services</i><br>
+<a name="habracut"></a><br>
+REST означает REpresentational State Transfer (Википедия: «передача состояния представления»). Это популярный архитектурный подход для создания API в современном мире.<br>
+<br>
+<h3>Вы изучите:</h3>
+<br>
+<ul>
+<li>Что такое REST? </li>
+<li>На чем основан REST API?</li>
+<li>Как используется HTTP при создании REST API?</li>
+<li>Что такое ресурс? </li>
+<li>Как вы определяете ресурсы REST API? </li>
+<li>Каковы лучшие практики при разработке REST API?</li>
+</ul>
+<br>
+<h3>Что такое REST? </h3>
+<br>
+REST расшифровывается как REpresentational State Transfer. Это был термин, первоначально введен Роем Филдингом (Roy Fielding), который также был одним из создателей протокола HTTP. Отличительной особенностью сервисов REST является то, что они позволяют наилучшим образом использовать протокол HTTP. Теперь давайте кратко рассмотрим HTTP.<br>
+<br>
+<h3>Краткий обзор HTTP </h3>
+<br>
+Давайте сначала откроем браузер и зайдем на веб-страницу:<br>
+<br>
+<amp-img src="https://habrastorage.org/webt/c8/uc/dv/c8ucdvx6ti0hypqhgghh-gopzm8.png" alt="" height="365" width="861" layout="intrinsic"></amp-img><br>
+<br>
+А затем щелкните на одной из страниц результатов:<br>
+<br>
+<amp-img src="https://habrastorage.org/webt/0g/o5/bo/0go5bola21uojbky4ys--n2e3ic.png" alt="" height="377" width="862" layout="intrinsic"></amp-img><br>
+<br>
+Далее мы можем нажать на ссылку на странице, на которой мы оказались:<br>
+<br>
+<amp-img src="https://habrastorage.org/webt/qq/mw/en/qqmwenq9zhpb6hwamxodeidivno.png" alt="" height="370" width="860" layout="intrinsic"></amp-img><br>
+<br>
+И перейти на другую страницу:<br>
+<br>
+<amp-img src="https://habrastorage.org/webt/by/hl/59/byhl59bblw_a66hik1ylkfvi4cm.png" alt="" height="470" width="863" layout="intrinsic"></amp-img><br>
+<br>
+Вот как мы обычно просматриваем веб страницы. <br>
+<br>
+Когда мы просматриваем страницы в Интернете, за кулисами происходит много вещей. Ниже приведено упрощенное представление о том, что происходит между браузером и серверами, работающими на посещаемых веб-сайтах:<br>
+<br>
+<amp-img src="https://habrastorage.org/webt/xn/om/zs/xnomzs-450ljr_-fei-vhx7kj-k.png" alt="" height="131" width="618" layout="intrinsic"></amp-img><br>
+<br>
+<h3>Протокол HTTP</h3>
+<br>
+Когда вы вводите в браузере URL-адрес, например <a href="https://www.google.com" rel="nofollow">www.google.com</a>, на сервер отправляется запрос на веб-сайт, идентифицированный URL-адресом.<br>
+Затем этот сервер формирует и выдает ответ. Важным является формат этих запросов и ответов. Эти форматы определяются протоколом <b>HTTP — Hyper Text Transfer Protocol</b>.<br>
+<br>
+Когда вы набираете URL в браузере, он отправляет запрос GET на указанный сервер. Затем сервер отвечает HTTP-ответом, который содержит данные в формате <b>HTML — Hyper Text Markup Language</b>. Затем браузер получает этот HTML-код и отображает его на экране.<br>
+<br>
+Допустим, вы заполняете форму, присутствующую на веб-странице, со списком элементов. В таком случае, когда вы нажимаете кнопку «<b>Submit</b>» (Отправить), HTTP-запрос <b>POST</b> отправляется на сервер.<br>
+<br>
+<h3>HTTP и RESTful веб-сервисы</h3>
+<br>
+HTTP обеспечивает базовый уровень для создания веб-сервисов. Поэтому важно понимать HTTP. Вот несколько ключевых абстракций.<br>
+<br>
+<h4>Ресурс </h4>
+<br>
+Ресурс — это ключевая абстракция, на которой концентрируется протокол HTTP. Ресурс — это все, что вы хотите показать внешнему миру через ваше приложение. Например, если мы пишем приложение для управления задачами, экземпляры ресурсов будут следующие:<br>
+<br>
+<ul>
+<li>Конкретный пользователь </li>
+<li>Конкретная задача </li>
+<li>Список задач</li>
+</ul>
+<br>
+<h4>URI ресурса</h4> <br>
+Когда вы разрабатываете RESTful сервисы, вы должны сосредоточить свое внимание на ресурсах приложения. Способ, которым мы идентифицируем ресурс для предоставления, состоит в том, чтобы назначить ему URI — универсальный идентификатор ресурса. Например:<br>
+<br>
+<ul>
+<li>Создать пользователя: <b>POST /users</b> </li>
+<li>Удалить пользователя: <b>DELETE /users/1</b> </li>
+<li>Получить всех пользователей: <b>GET /users</b> </li>
+<li>Получить одного пользователя: <b>GET /users/1</b>
+</li>
+</ul>
+<br>
+<h3>REST и Ресурсы </h3>
+<br>
+Важно отметить, что с REST вам нужно думать о приложении с точки зрения ресурсов:<br>
+Определите, какие ресурсы вы хотите открыть для внешнего мира <br>
+Используйте глаголы, уже определенные протоколом HTTP, для выполнения операций с этими ресурсами.<br>
+<br>
+Вот как обычно реализуется служба REST: <br>
+<br>
+<ul>
+<li>
+<b>Формат обмена данными</b>: здесь нет никаких ограничений. JSON — очень популярный формат, хотя можно использовать и другие, такие как XML </li>
+<li>
+<b>Транспорт</b>: всегда HTTP. REST полностью построен на основе HTTP. </li>
+<li>
+<b>Определение сервиса</b>: не существует стандарта для этого, а REST является гибким. Это может быть недостатком в некоторых сценариях, поскольку потребляющему приложению может быть необходимо понимать форматы запросов и ответов. Однако широко используются такие языки определения веб-приложений, как WADL (Web Application Definition Language) и Swagger.</li>
+</ul>
+<br>
+REST фокусируется на ресурсах и на том, насколько эффективно вы выполняете операции с ними, используя HTTP.<br>
+<br>
+<h3>Компоненты HTTP</h3>
+<br>
+HTTP определяет следующую структуру запроса: <br>
+<br>
+<ul>
+<li>строка запроса (<b>request line</b>) — определяет тип сообщения</li>
+<li>заголовки запроса (<b>header fields</b>) — характеризуют тело сообщения, параметры передачи и прочие сведения</li>
+<li>тело сообщения (<b>body</b>) — необязательное</li>
+</ul>
+<br>
+HTTP определяет следующую структуру ответного сообщения (response):<br>
+<br>
+<ul>
+<li>строка состояния (<b>status line</b>), включающая код состояния и сообщение о причине </li>
+<li>поля заголовка ответа (<b>header fields</b>) </li>
+<li>дополнительное тело сообщения (<b>body</b>) </li>
+</ul>
+<br>
+<h4>Методы HTTP-запроса </h4>
+<br>
+Метод, используемый в HTTP-запросе, указывает, какое действие вы хотите выполнить с этим запросом. Важные примеры: <br>
+<br>
+<ul>
+<li>
+<b>GET</b>: получить подробную информацию о ресурсе </li>
+<li>
+<b>POST</b>: создать новый ресурс </li>
+<li>
+<b>PUT</b>: обновить существующий ресурс </li>
+<li>
+<b>DELETE</b>: Удалить ресурс</li>
+</ul>
+<br>
+<h4>Код статуса ответа HTTP </h4>
+<br>
+Код состояния всегда присутствует в ответе HTTP. Типичные примеры: <br>
+<br>
+<ul>
+<li>200 — успех </li>
+<li>404 — cтраница не найдена </li>
+</ul>
+<br>
+По этому вопросу имеется авторское <a href="https://youtu.be/ONelFjri_j0" rel="nofollow">видео</a>.<br>
+<br>
+<h3>Резюме </h3>
+<br>
+В статье приведен на верхнем уровне обзор архитектурного стиля REST. Подчеркивается тот факт, что HTTP является основным строительным блоком REST сервисов. HTTP — это протокол, который используется для определения структуры запросов и ответов браузера. Мы видели, что HTTP имеет дело главным образом с ресурсами, доступными на веб-серверах. Ресурсы идентифицируются с помощью URI, а операции над этими ресурсами выполняются с использованием глаголов, определенных протоколом HTTP. <br>
+<br>
+Наконец, мы рассмотрели, как службы REST наилучшим образом используют функции, предлагаемые HTTP, для предоставления ресурсов внешнему миру. REST не накладывает никаких ограничений на форматы представления ресурсов или на определение сервиса.<br>
+<br>
+<h3>Дополнительное чтение</h3>
+<br>
+<a href="https://dzone.com/refcardz/rest-foundations-restful?chapter=1" rel="nofollow">Foundations of RESTful Architecture</a><br>
+<a href="https://dzone.com/articles/developing-rest-apis" rel="nofollow">Developing REST APIs</a>
+        </div>
+        <div class="tm-article__tags">
+          <div>
+            <span class="tm-article__tags-title">Теги:</span>
+          </div>
+          <div>
+            
+            <a href="/ru/search/?target_type=posts&amp;q=rest"
+             >rest</a>, 
+            <a href="/ru/search/?target_type=posts&amp;q=api"
+             >api</a>, 
+            <a href="/ru/search/?target_type=posts&amp;q=restful"
+             >restful</a>, 
+            <a href="/ru/search/?target_type=posts&amp;q=web-services"
+             >web-services</a> 
+          </div>
+        </div>
+        <div class="tm-article__tags">
+          <div>
+            <span class="tm-article__tags-title">Хабы:</span>
+          </div>
+          <div>
+            
+              <a href="/hub/api">API</a>
+            
+          </div>
+        </div>
+        <amp-list layout="fixed-height" src="/ru/amp/api/post-info/483202" height="56">
+          <template type="amp-mustache">
+            <div class="tm-data-icons tm-article-icons">
+              <span class="tm-icon-text tm-data-icons__item">
+                <svg id="counter-rating" class="tm-icon-text__icon" fill="#bbcdd6" viewBox="0 0 10 16" width="12px"
+                  height="18px">
+                  <path d="M10,6 L10,10 L5,16 L0,10 L0,6 L5,0 L10,6 Z"></path>
+                </svg>
+                {{ score }}
+              </span>
+              <span class="tm-icon-text tm-data-icons__item">
+                <svg id="counter-views" class="tm-icon-text__icon" fill="#bbcdd6" viewBox="0 0 56 32" width="16px"
+                  height="12px">
+                  <path
+                    d="M28 0c18.368 0 28 13.81 28 16s-9.632 16-28 16c-18.368 0-28-13.81-28-16s9.632-16 28-16zm0 28.309c6.874 0 12.446-5.511 12.446-12.309s-5.572-12.309-12.446-12.309-12.446 5.511-12.446 12.309 5.572 12.309 12.446 12.309zM28 16c.084-1.721 5.596-3.019 4.284-4.352-2.429-2.468-6.317-2.521-8.684-.117s-2.314 6.354.116 8.821c2.429 2.468 6.317 2.521 8.683.117 1.089-1.106-4.47-3.008-4.399-4.469z">
+                  </path>
+                </svg>
+                {{ readingCount }}
+              </span>
+              <span class="tm-icon-text tm-data-icons__item">
+                <svg id="counter-bookmarks" class="tm-icon-text__icon" fill="#bbcdd6" viewBox="0 0 20 32" width="10px"
+                  height="16px">
+                  <path d="M10 25.645l10 6.355v-30c0-1.105-.895-2-2-2h-16c-1.105 0-2 .895-2 2v30l10-6.355z"></path>
+                </svg>
+                {{ favoritesCount }}
+              </span>
+            </div>
+          </template>
+        </amp-list>
+      </article>
+
+      <div class="tm-user-card tm-page-article__author">
+        <div class="tm-user-card__header">
+          <div class="tm-user-card__header-data">
+            <a href="/users/val6852/posts/" class="tm-user-card__userpic">
+              <div class="tm-entity-image">
+                
+                    <svg height="48px" width="48px" viewBox="0 0 24 24" class="tm-svg-img tm-image-placeholder tm-image-placeholder_blue">
+                      <path d="M21.5 24h-19c-1.379 0-2.5-1.122-2.5-2.5v-19c0-1.379 1.122-2.5 2.5-2.5h19c1.379 0 2.5 1.122 2.5 2.5v19c0 1.379-1.122 2.5-2.5 2.5zm-19-23c-.827 0-1.5.673-1.5 1.5v19c0 .827.673 1.5 1.5 1.5h19c.827 0 1.5-.673 1.5-1.5v-19c0-.827-.673-1.5-1.5-1.5h-19zM15.598 12.385zM19.438 15.417l-.002-.005v-.001c-.875-2.226-2.484-3.054-3.445-3.549l-.273-.143c.029-.497-.025-1.034-.167-1.599l-.128.032.123-.044c-.765-2.152-1.757-2.585-2.632-2.967l-.006-.003-.535-2.121c.357-.065.628-.375.628-.752.001-.423-.342-.765-.765-.765s-.766.342-.766.765c0 .358.248.657.581.74l-.825 1.654-.014-.003-.024-.003c-1.053-.033-1.842.369-2.5.947-.633-.322-1.515-.729-2.158-1.814.107-.12.174-.276.174-.45 0-.375-.303-.678-.678-.678s-.678.303-.678.678.303.678.678.678l.221-.04c.416.597 1.09 1.181 1.347 2.828l-.072.091.104.081-.112-.067c-1.157 1.914-.793 4.248.207 5.37-.998 2.546-1.035 4.681-.097 5.868l.002.002.003.003c.119.162.313.233.524.233.189 0 .39-.057.559-.154.312-.179.441-.459.326-.713l-.12.054.119-.056c-.581-1.243-.474-2.713.314-4.37.4.131.778.208 1.145.234l.139.73c.264 1.418.514 2.757 1.297 4.006.132.264.453.387.777.387.122 0 .245-.018.357-.051.385-.116.591-.399.537-.738l-.129.021.125-.042c-.204-.606-.431-1.146-.649-1.67-.373-.894-.725-1.742-.891-2.737.407-.042.797-.129 1.161-.261.825.692 1.661 1.492 2.743 3.406h.001c.072.14.224.215.41.215.105 0 .222-.024.339-.073.365-.155.652-.531.477-1.006v-.001c-.432-1.849-1.426-2.778-2.428-3.547.162-.175.311-.366.442-.576.75.399 1.878 1.005 3.127 2.766l.047.067.011-.008c.151.156.317.24.48.24.096 0 .191-.027.279-.084.306-.194.439-.662.29-1.005zm-8.878-2.493c-.947 0-1.713-.767-1.713-1.713s.767-1.713 1.713-1.713c.947 0 1.713.767 1.713 1.713s-.767 1.713-1.713 1.713zm6.587 4.648l-.084.021v-.001l.084-.02zm-2.007-5.312zm.022 1.006zM11.225 11.604c0 .385-.312.697-.697.697s-.697-.312-.697-.697c0-.385.312-.697.697-.697s.697.312.697.697z" />
+                    </svg>
+                  
+              </div>
+            </a>
+            <div class="tm-user-card__meta">
+              <div class="tm-karma tm-user-card__karma">
+                
+                <span class="tm-votes-score tm-votes-score_positive">
+                  119
+                </span>
+                 
+                <div class="tm-karma__text">
+                  <span>Карма</span>
+                </div>
+              </div>
+              <div class="tm-rating tm-user-card__rating">
+                <span class="tm-rating__counter">0</span>
+                <div class="tm-rating__text"><span>Рейтинг</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="tm-user-card__info">
+          <div class="tm-user-card__title">
+            <span class="tm-user-card__name"></span>
+            <a href="/users/val6852/posts/" class="tm-user-card__nickname">
+              @val6852
+            </a>
+          </div>
+          <p class="tm-user-card__short-info">
+            <span>
+              
+            </span>
+          </p>
+        </div>
+      </div>
+
+      <amp-list layout="fixed-height" src="https://habr.com/ru/amp/api/post-info/483202" height="56">
+        <template type="amp-mustache">
+          <a href="/post/483202/comments/" class="tm-article-comments" id="comments-link">
+            <svg class="tm-article-comments__icon" id="counter-comments" viewBox="0 0 32 32" width="100%" height="100%">
+              <path
+                d="M18 24v8l-10-8h-6c-1.105 0-2-.895-2-2v-20c0-1.105.895-2 2-2h28c1.105 0 2 .895 2 2v20c0 1.105-.895 2-2 2h-12z">
+              </path>
+            </svg>
+            Комментарии {{ commentsCount }}
+          </a>
+        </template>
+        <a href="/post/483202/comments/" class="tm-article-comments tm-article-comments_fallback" id="comments-link" fallback>
+          <svg class="tm-article-comments__icon" id="counter-comments" viewBox="0 0 32 32" width="100%" height="100%">
+            <path
+              d="M18 24v8l-10-8h-6c-1.105 0-2-.895-2-2v-20c0-1.105.895-2 2-2h28c1.105 0 2 .895 2 2v20c0 1.105-.895 2-2 2h-12z">
+            </path>
+          </svg>
+          Комментарии
+        </a>
+      </amp-list>
+
+      <template type="amp-mustache" id="dateTime">
+        {{ day }}
+        {{ monthNameShort }}
+        {{ year }}, {{ hour }}:{{ minute }}
+      </template>
+
+      <div class="tm-article-list-block">
+        <amp-list layout="fixed-height" src="https://habr.com/ru/amp/api/483202/similar/" height="1" [height]="items.length * 130">
+          <div class="tm-article-list-block__header">
+            <div class="tm-article-list-block__title">
+                Похожие публикации
+            </div>
+          </div>
+          <template type="amp-mustache">
+              <article class="tm-article-similar tm-article-similar_preview">
+                <div class="tm-article-similar__block">
+                  <div class="tm-article-similar__date">
+                    <amp-date-display
+                      locale="ru"
+                      layout="fixed-height"
+                      height="24px"
+                      template="dateTime"
+                      datetime="{{ timePublished }}"
+                    >
+                    </amp-date-display>
+                  </div>
+                <h2 class="tm-article-title tm-article-similar-title_preview tm-article-title_preview">
+                  <a href="/post/{{ id }}/" class="tm-article-title__link" id="similar-link">
+                    {{ titleHtml }}
+                  </a>
+                </h2>
+              </div>
+            </article>
+          </template>
+        </amp-list>
+      </div>
+
+      <div class="tm-article-list-block">
+          <amp-list layout="fixed-height" src="https://habr.com/ru/amp/api/top/" height="1" [height]="items.length * 130">
+            <div class="tm-article-list-block__header">
+              <div class="tm-article-list-block__title">
+                Лучшие за сутки
+              </div>
+            </div>
+            <template type="amp-mustache">
+              <article class="tm-article-similar tm-article-similar_preview">
+                <div class="tm-article-similar__block">
+                  <div class="tm-article-similar__date">
+                    <amp-date-display
+                      locale="ru"
+                      layout="fixed-height"
+                      height="24px"
+                      template="dateTime"
+                      datetime="{{ timePublished }}"
+                    >
+                    </amp-date-display>
+                  </div>
+                <h2 class="tm-article-title tm-article-similar-title_preview tm-article-title_preview">
+                  <a href="/post/{{ id }}/" class="tm-article-title__link" id="top-link">
+                    {{ titleHtml }}
+                  </a>
+                </h2>
+              </div>
+            </article>
+            </template>
+          </amp-list>
+        </div>
+  </main>
+  <div class="tm-footer">
+    <div class="tm-footer__container">
+      <div class="tm-footer__title">
+        <a href="/" class="tm-svg-icon__wrapper tm-footer__title-link">
+          <svg height="16" width="16" class="tm-svg-img tm-svg-icon">
+            <use xlink:href="https://habr.com/img/habr-logo-ru.svg#logo"></use>
+          </svg>
+        </a>
+      </div>
+      <a href="https://habr.com/ru/post/483202/" class="tm-footer__link">
+        <span>Полная версия</span>
+      </a>
+      <div class="tm-footer-copyright">
+        <span class="tm-copyright">
+          <span class="tm-copyright__years">© 2006–2023</span>
+          <span class="tm-copyright__name">
+            «<a href="https://company.habr.com/" target="_blank" class="tm-copyright__link">Habr</a>»
+          </span>
+        </span>
+      </div>
+    </div>
+  </div>
+</body>
+</html>
